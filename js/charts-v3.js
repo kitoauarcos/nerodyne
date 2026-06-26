@@ -3,7 +3,7 @@
    Chart.js v4 is loaded from CDN in each page that needs it.
    =========================================================================== */
 
-const NERO = (() => {
+const NERODYNE = (() => {
   const C = { accent: '#34d399', accent2: '#60a5fa', gold: '#e7c873', spy: '#6b7280', grid: 'rgba(255,255,255,.06)', text: '#99a2b2' };
   // stable per-model line colour for multi-model views
   const MCOL = { vortex: C.accent, apex: C.accent, surge: C.gold, anchor: C.accent2 };
