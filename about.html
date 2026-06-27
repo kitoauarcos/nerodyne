@@ -41,7 +41,7 @@
     <div class="panel feature reveal">
       <h2 style="font-size:1.6rem;">Built by Nerodyne</h2>
       <p class="mt-s">Nerodyne runs <b>Vortex</b>, a systematic equity strategy that, at each rebalance, scans a family of models and routes into the most diversified, high-conviction book. Its backtested annualised return is about +39% versus +14.5% for the S&amp;P 500, with a Sharpe of 1.38 and not a single losing year across the sample.</p>
-      <p class="mt-s">Vortex comes in two versions: run it pure, or as <b>Vortex Shield</b>, the same book with an optional options hedge that trades a little return for a shallower drawdown, and in the 2022 bear market turned a flat year into +26%. The strategy was backtested over 12 years and has now run live for about a year. The logic stays private; the results, the risk, and the delivery do not. For those who would rather build their own, we teach the approach.</p>
+      <p class="mt-s">Vortex comes in two versions: run it pure, or as <b>Vortex Shield</b>, the same book wrapped in a permanent put-option hedge. Shield is the safety-first version: it gives up some return in calm years to cap losses in a crash, and in the two worst markets of the sample (2020 and 2022) the convex hedge actually turned the crash years strongly positive. The strategy was backtested over 12 years and has now run live for about a year. The logic stays private; the results, the risk, and the delivery do not. For those who would rather build their own, we teach the approach.</p>
     </div>
   </div>
 </section>
@@ -53,6 +53,39 @@
     <div class="panel feature reveal center"><div class="num gradient-text" style="font-family:var(--display);font-size:2.4rem;font-weight:700;">100%</div><p>transparent results: we show the full sample, not a highlight reel</p></div>
   </div>
   <div class="center mt-l"><a href="performance.html" class="btn btn-primary">See the track record</a></div>
+</section>
+
+<!-- WHAT THIS IS -->
+<section class="container">
+  <div class="section-head"><span class="eyebrow">How it works as a service</span><h2>A research subscription, not advice</h2>
+    <p class="lead">You're buying the <b>output</b> of the model, not the model itself, and not personalised advice. The same way a quant fund keeps its methodology private, ours stays confidential. What you receive is a research signal you choose to act on, in your own brokerage account.</p>
+    <div class="kicker-line"></div>
+  </div>
+  <div class="grid-2">
+    <div class="panel feature reveal">
+      <h3>What we disclose</h3>
+      <ul style="margin-top:8px;display:grid;gap:8px;">
+        <li><b style="color:var(--text)">The model.</b> A proprietary, systematic strategy that evaluates a large set of market and fundamental data points. The precise methodology is confidential.</li>
+        <li><b style="color:var(--text)">Universe.</b> Liquid, US-listed equities. No micro-caps, no illiquid names.</li>
+        <li><b style="color:var(--text)">Cadence.</b> The model is re-run regularly; the book typically rebalances a couple of times a year, and you get a weekly status update.</li>
+        <li><b style="color:var(--text)">Leverage.</b> None. The book is long-only equities.</li>
+        <li><b style="color:var(--text)">Options.</b> The <b>Shield</b> version uses protective <b>put options</b> (an index ladder plus puts on the holdings). Options carry their own risks and costs, and the full single-stock hedge is realistic mainly for larger accounts (roughly $300k+); smaller accounts can run a simplified or index-only hedge, or the unhedged version.</li>
+        <li><b style="color:var(--text)">Performance.</b> Shown as a full-sample backtest (2012–present) plus ~1 year live, stated accurately, with drawdowns and worst years visible, not a highlight reel.</li>
+      </ul>
+    </div>
+    <div class="panel feature reveal">
+      <h3>Our trading policy</h3>
+      <p class="mt-s">We aim to align our interests with yours:</p>
+      <ul style="margin-top:8px;display:grid;gap:8px;">
+        <li>We invest using the <b>same model</b> our subscribers receive.</li>
+        <li>We may follow the publicly available <b>hedged</b> version of that model.</li>
+        <li>We may own, hedge, rebalance, or sell any security in the model at any time.</li>
+        <li>We do <b>not</b> front-run subscribers, and our personal trades are not intended to predict or benefit from subscriber activity.</li>
+      </ul>
+      <p class="note mt-m">We're long the same names you are; the only difference is risk management. A written policy we follow consistently matters more than any single trade.</p>
+    </div>
+  </div>
+  <p class="note center mt-l" style="max-width:75ch;margin-inline:auto;">Nerodyne provides research and educational content only. It is not investment advice, a recommendation, brokerage, or asset management, and nothing here is tailored to your personal circumstances. Investing involves risk, including the possible loss of principal; options can expire worthless. You are responsible for your own decisions and should consider professional advice for your situation.</p>
 </section>
 
 <footer class="site-footer">
