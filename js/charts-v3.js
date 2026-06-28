@@ -130,9 +130,10 @@ const NERODYNE = (() => {
     if (!wrap) return;
     const m = d.models.find(x => x.flagship) || d.models[0];
     const variants = [
-      { key: 'unhedged', name: m.name, tag: 'pure · unhedged · full upside', col: C.accent, badge: 'Pure' },
-      { key: 'hedged', name: `${m.name} Shield`, tag: 'hedged · put-protected · smoother ride', col: C.accent2, badge: 'Hedged' }
-    ];
+      { key: 'unhedged', name: m.name, tag: 'unhedged · concentrated · highest return', col: C.accent, badge: 'Pure' },
+      { key: 'hedged', name: `${m.name} Shield`, tag: 'hedged · concentrated · convex protection', col: C.accent2, badge: 'Hedged' },
+      { key: 'diversified', name: 'Diversified Shield', tag: 'hedged · 15+ holdings · lowest drawdown', col: C.gold, badge: 'Diversified' }
+    ].filter(v => m[v.key]);
     variants.forEach((vt, i) => {
       const cid = `${m.id}-${vt.key}`;
       const card = document.createElement('div');
