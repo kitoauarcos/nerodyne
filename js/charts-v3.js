@@ -213,7 +213,8 @@ const NERODYNE = (() => {
       const m = d.models.find(x => x.id === current);
       yearChart.data.datasets = [
         { label: `${m.name} · unhedged`, data: m.yearly.unhedged, backgroundColor: C.accent, borderRadius: 3 },
-        { label: `${m.name} · hedged`, data: m.yearly.hedged, backgroundColor: C.accent2, borderRadius: 3 },
+        { label: `${m.name} Shield`, data: m.yearly.hedged, backgroundColor: C.accent2, borderRadius: 3 },
+        ...(m.yearly.diversified ? [{ label: 'Diversified Shield', data: m.yearly.diversified, backgroundColor: C.gold, borderRadius: 3 }] : []),
         { label: 'S&P 500', data: d.spyYearly, backgroundColor: C.spy, borderRadius: 3 }
       ];
       yearChart.update();
@@ -223,7 +224,8 @@ const NERODYNE = (() => {
       const m = d.models.find(x => x.id === current);
       const sets = [];
       if (showUnhedged) sets.push(ds(`${m.name} · unhedged`, m.unhedged.curve, C.accent));
-      if (showHedged) sets.push(ds(`${m.name} · hedged`, m.hedged.curve, C.accent2));
+      if (showHedged) sets.push(ds(`${m.name} Shield`, m.hedged.curve, C.accent2));
+      if (m.diversified) sets.push(ds('Diversified Shield', m.diversified.curve, C.gold));
       if (showSpy) sets.push(ds('S&P 500', d.spy, C.spy));
       chart.data.labels = m.dates; chart.data.datasets = sets; chart.update();
       drawYears();
@@ -235,8 +237,9 @@ const NERODYNE = (() => {
           <td class="${s.worst < 0 ? 'down' : 'up'}">${s.worst >= 0 ? '+' : ''}${s.worst.toFixed(1)}%</td>
           <td>+${Math.round(s.total * 100).toLocaleString()}%</td></tr>`;
         tbl.querySelector('tbody').innerHTML =
-          row(`${m.name} · Unhedged`, m.unhedged.stats) +
-          row(`${m.name} · Hedged`, m.hedged.stats) +
+          row(`${m.name} (unhedged)`, m.unhedged.stats) +
+          row(`${m.name} Shield`, m.hedged.stats) +
+          (m.diversified ? row('Diversified Shield', m.diversified.stats) : '') +
           `<tr><td>S&amp;P 500 (SPY)</td><td class="up">+${d.spyStats.ann.toFixed(1)}%</td>
             <td>${d.spyStats.vol.toFixed(1)}%</td><td>${d.spyStats.sharpe.toFixed(2)}</td>
             <td class="down">${d.spyStats.maxdd.toFixed(1)}%</td>
