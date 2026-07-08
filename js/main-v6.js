@@ -102,51 +102,60 @@
     }, true);
   }
 
-  // z-axis fly-through: scroll dollies the camera through the homepage scenes
+  // z-axis fly-through: scroll dollies the camera through the homepage scenes.
+  // The rendered position lerps toward the scroll target for an inertial glide.
   const track = document.getElementById('zoomTrack');
   const scenes = track ? Array.from(track.querySelectorAll('.scene')) : [];
   if (track && scenes.length > 1 && !reduceMotion && window.innerWidth > 920) {
     document.documentElement.classList.add('zoom-on');
-    track.style.height = (scenes.length * 130) + 'vh';
+    track.style.height = (scenes.length * 160) + 'vh';
 
-    // progress dots
     const dots = document.createElement('div');
     dots.className = 'scene-dots';
     dots.innerHTML = scenes.map(() => '<span></span>').join('');
     document.body.appendChild(dots);
     const dotEls = Array.from(dots.children);
 
-    const SP = 1500;   // z distance between scenes, px
-    let ticking = false;
-    const update = () => {
-      ticking = false;
+    const SP = 1050;          // z distance between scenes (gentler than before)
+    let target = 0, shown = -1, raf = null;
+
+    const render = (p) => {
       const vh = window.innerHeight;
-      const top = track.offsetTop;
-      const span = (track.offsetHeight - vh) / (scenes.length - 1);
-      const p = Math.max(0, Math.min(scenes.length - 1, (window.scrollY - top) / span));
       scenes.forEach((sc, i) => {
-        const d = i - p;                    // >0 still ahead (deep), <0 already passed
-        const z = -d * SP;
+        const d = i - p;
         let op;
-        if (d >= 0) op = 1 - Math.min(1, Math.max(0, (d - .1) / .8));
-        else op = 1 - Math.min(1, -d * 2.6);
-        sc.style.transform = 'translateZ(' + z.toFixed(1) + 'px)';
+        if (d >= 0) op = 1 - Math.min(1, Math.max(0, (d - .05) / .9));
+        else op = 1 - Math.min(1, -d * 1.9);
+        sc.style.transform = 'translateZ(' + (-d * SP).toFixed(1) + 'px)';
         sc.style.opacity = op.toFixed(3);
         sc.style.visibility = op <= 0.02 ? 'hidden' : 'visible';
         sc.style.pointerEvents = Math.abs(d) < .45 ? 'auto' : 'none';
       });
       const active = Math.round(p);
       dotEls.forEach((el, i) => el.classList.toggle('on', i === active));
-      // hide the dots once the fly-through is behind us
       const r = track.getBoundingClientRect();
       dots.classList.toggle('gone', r.bottom < vh * .6);
     };
-    document.addEventListener('scroll', () => {
-      if (!ticking) { ticking = true; requestAnimationFrame(update); }
-    }, { passive: true });
-    window.addEventListener('resize', update);
-    update();
-    // clicking a dot flies to that scene
+
+    const targetP = () => {
+      const vh = window.innerHeight;
+      const span = (track.offsetHeight - vh) / (scenes.length - 1);
+      return Math.max(0, Math.min(scenes.length - 1, (window.scrollY - track.offsetTop) / span));
+    };
+    const loop = () => {
+      shown += (target - shown) * 0.14;
+      if (Math.abs(target - shown) < 0.0015) shown = target;
+      render(shown);
+      raf = (shown !== target) ? requestAnimationFrame(loop) : null;
+    };
+    const kick = () => {
+      target = targetP();
+      if (raf === null) raf = requestAnimationFrame(loop);
+    };
+    document.addEventListener('scroll', kick, { passive: true });
+    window.addEventListener('resize', kick);
+    shown = targetP(); target = shown; render(shown);
+
     dotEls.forEach((el, i) => {
       el.style.cursor = 'pointer'; el.style.pointerEvents = 'auto';
       el.addEventListener('click', () => {
@@ -156,16 +165,17 @@
     });
   }
 
-  // hero constellation — a sparse, slowly drifting signal field
-  const fx = document.getElementById('heroFx');
-  if (fx && !reduceMotion && window.innerWidth > 720) {
+  // constellation — a sparse, slowly drifting signal field behind every page
+  const fx = document.createElement('canvas');
+  fx.className = 'bg-fx';
+  if (!reduceMotion && window.innerWidth > 720) {
+    document.body.appendChild(fx);
     const ctx = fx.getContext('2d');
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
     let W, H, pts;
-    const N = 42, LINK = 150;
+    const N = 48, LINK = 150;
     function resize() {
-      const r = fx.parentElement.getBoundingClientRect();
-      W = r.width; H = r.height;
+      W = window.innerWidth; H = window.innerHeight;
       fx.width = W * dpr; fx.height = H * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }

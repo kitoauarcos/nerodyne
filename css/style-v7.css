@@ -625,10 +625,12 @@ html { scroll-snap-type: y proximity; }
   background: radial-gradient(1100px 640px at 72% 50%, rgba(var(--ch-rgb), .09), transparent 62%);
 }
 .ch-num {
-  position: absolute; right: 2vw; top: 50%; transform: translateY(-50%);
+  position: absolute; right: 3vw; top: 50%; transform: translateY(-50%);
   font-family: var(--display); font-weight: 700; line-height: 1;
-  font-size: clamp(14rem, 32vw, 30rem); color: transparent;
-  -webkit-text-stroke: 1.5px rgba(var(--ch-rgb), .16);
+  font-size: clamp(5.5rem, 10vw, 9.5rem); color: transparent;
+  -webkit-text-stroke: 1.5px rgba(var(--ch-rgb), .2);
+  text-transform: uppercase; letter-spacing: .12em;
+  writing-mode: vertical-rl; text-orientation: mixed;
   pointer-events: none; user-select: none; will-change: transform, opacity;
 }
 .ch-inner { position: relative; z-index: 1; will-change: transform, opacity; }
@@ -638,8 +640,8 @@ html { scroll-snap-type: y proximity; }
 }
 .ch-idx::before { content: ""; width: 30px; height: 1px; background: var(--ch); }
 .ch-title {
-  font-size: clamp(3.2rem, 9vw, 6.8rem); text-transform: uppercase;
-  letter-spacing: -.02em; line-height: .98; margin: 18px 0 14px;
+  font-size: clamp(2.8rem, 7vw, 5.4rem);
+  letter-spacing: -.03em; line-height: 1.02; margin: 16px 0 14px;
 }
 .ch-line { font-size: 1.2rem; color: var(--muted); max-width: 52ch; }
 .ch-stats { display: flex; gap: 36px; flex-wrap: wrap; margin: 34px 0 30px; }
@@ -655,7 +657,7 @@ html { scroll-snap-type: y proximity; }
   .hero { min-height: auto; padding-block: 70px 60px; }
   .scroll-cue { display: none; }
   .chapter { min-height: auto; padding: 80px 0; }
-  .ch-num { font-size: 11rem; right: -4vw; opacity: .6; }
+  .ch-num { font-size: 5rem; right: 2vw; opacity: .55; }
   html { scroll-snap-type: none; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -708,4 +710,26 @@ html { scroll-snap-type: y proximity; }
 
 @media (max-width: 920px), (prefers-reduced-motion: reduce) {
   .reveal { transform: none; filter: none; }
+}
+
+
+/* ── fly-through refinements ─────────────────────────────────────────────── */
+
+/* site-wide constellation backdrop (canvas injected by JS on every page) */
+.bg-fx { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: .4; }
+
+/* compact hero inside the fly-through so everything fits one viewport */
+.zoom-on .scene { padding-top: 70px; }   /* clear the sticky header */
+.zoom-on .scene.hero .hero-grid { gap: 44px; }
+.zoom-on .scene.hero h1 { font-size: clamp(2.1rem, 4.4vw, 3.5rem); margin: 12px 0 14px; }
+.zoom-on .scene.hero .lead { font-size: 1.02rem; margin-bottom: 16px; }
+.zoom-on .scene.hero .hero-stats { margin-top: 22px; gap: 22px; }
+.zoom-on .scene.hero .hero-stats .stat { min-width: 116px; }
+.zoom-on .scene.hero .hero-stats .num { font-size: 1.35rem; }
+.zoom-on .scene.hero .chart-wrap { height: 280px; }
+@media (max-height: 900px) {
+  .zoom-on .scene.hero .join-row { display: none !important; }
+  .zoom-on .scene.hero .hero-stats { margin-top: 16px; }
+  .zoom-on .scene.hero .chart-wrap { height: 235px; }
+  .zoom-on .scene.hero .lead { font-size: .96rem; }
 }
