@@ -7,7 +7,7 @@
 <meta name="description" content="NERODYNE runs systematic equity models built by Nerodyne: 12 years backtested and now one year live. When a model changes its holdings or hedge, you get the exact moves on your phone.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style-v3.css">
+<link rel="stylesheet" href="css/style-v4.css">
 <link rel="icon" href="assets/logo.svg">
 </head>
 <body>
@@ -164,13 +164,16 @@
       <a href="performance.html" class="btn btn-primary mt-l">Compare the versions</a>
     </div>
     <div class="panel glow reveal" style="padding:28px;">
-      <div class="note" style="margin-bottom:18px;">2022 bear market, calendar year return</div>
-      <div class="bars">
-        <div class="bar-row"><span class="lab">Vortex</span><div class="bar-track"><div class="bar-fill" data-w="14"></div></div><span class="val" style="color:var(--accent)">−2.5%</span></div>
-        <div class="bar-row"><span class="lab">Vortex Shield</span><div class="bar-track"><div class="bar-fill" data-w="89"></div></div><span class="val" style="color:var(--accent-2)">+16.2%</span></div>
-        <div class="bar-row"><span class="lab">S&amp;P 500</span><div class="bar-track"><div class="bar-fill spy" data-w="100"></div></div><span class="val" style="color:var(--danger)">−18.2%</span></div>
+      <div class="chart-head" style="margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+        <div class="note">Calendar year return, pick a stress year</div>
+        <div class="toggle" id="bearPick" style="font-size:.72rem;">
+          <button data-y="2018">2018</button>
+          <button data-y="2020">2020</button>
+          <button class="active" data-y="2022">2022</button>
+        </div>
       </div>
-      <p class="note mt-m">In the weakest market of the sample period, the hedge produced a clearly positive year. The full year by year figures are on the performance page.</p>
+      <div class="bars" id="bearBars"></div>
+      <p class="note mt-m">In the weakest markets of the sample period the hedge changed the outcome materially. The full year by year figures are on the performance page.</p>
     </div>
   </div>
 </section>
@@ -236,8 +239,8 @@
 
 <script src="js/chart.umd.min.js"></script>
 <script src="data/performance.js"></script>
-<script src="js/charts-v5.js"></script>
+<script src="js/charts-v6.js"></script>
 <script src="js/main-v3.js"></script>
-<script>NERODYNE.hero('heroChart','heroToggle'); NERODYNE.modelCards('modelScroller');</script>
+<script>NERODYNE.hero('heroChart','heroToggle'); NERODYNE.modelCards('modelScroller'); NERODYNE.bearBars('bearBars','bearPick');</script>
 </body>
 </html>

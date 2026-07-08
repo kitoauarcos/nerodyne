@@ -287,13 +287,18 @@ const NERODYNE = (() => {
       yearChart.update();
     }
 
+    const ddSeries = (curve) => {
+      let peak = -Infinity;
+      return curve.map(v => { peak = Math.max(peak, v); return +((v / peak - 1) * 100).toFixed(2); });
+    };
     function draw() {
       const m = d.models.find(x => x.id === current);
+      const t = (curve) => (typeof scaleMode !== 'undefined' && scaleMode === 'dd') ? ddSeries(curve) : curve;
       const sets = [];
-      if (showUnhedged) sets.push(ds(`${m.name} · unhedged`, m.unhedged.curve, MCOL[m.id] || C.accent));
-      if (showHedged && m.hedged) sets.push(ds(`${m.name} Shield`, m.hedged.curve, C.accent2));
-      if (m.diversified) sets.push(ds('Diversified Shield', m.diversified.curve, C.gold));
-      if (showSpy) sets.push(ds('S&P 500', d.spy, C.spy));
+      if (showUnhedged) sets.push(ds(`${m.name} · unhedged`, t(m.unhedged.curve), MCOL[m.id] || C.accent));
+      if (showHedged && m.hedged) sets.push(ds(`${m.name} Shield`, t(m.hedged.curve), C.accent2));
+      if (m.diversified) sets.push(ds('Diversified Shield', t(m.diversified.curve), C.gold));
+      if (showSpy) sets.push(ds('S&P 500', t(d.spy), C.spy));
       chart.data.labels = m.dates; chart.data.datasets = sets; chart.update();
       drawYears();
       const tbl = document.getElementById(tableId);
@@ -325,6 +330,8 @@ const NERODYNE = (() => {
           sel.querySelectorAll('button').forEach(x => { x.classList.remove('btn-primary'); x.classList.add('btn-ghost'); });
           b.classList.remove('btn-ghost'); b.classList.add('btn-primary');
           draw();
+          const amtEl = document.getElementById('calcAmt');
+          if (amtEl) amtEl.dispatchEvent(new Event('input'));
         });
         sel.appendChild(b);
       });
@@ -339,33 +346,63 @@ const NERODYNE = (() => {
       });
     });
 
-    // log view shows cumulative % return on the axis; $ view shows dollar value of $100
+    // scale modes: log (% return), linear ($ of 100), dd (underwater drawdown)
     const pct = (v) => (v >= 100 ? '+' : '') + Math.round((v / 100 - 1) * 100).toLocaleString() + '%';
     const LOG_TICKS = [100, 300, 1000, 3000, 10000];
+    let scaleMode = 'log';
     function applyScale() {
       const y = chart.options.scales.y;
-      y.type = useLog ? 'logarithmic' : 'linear';
-      y.beginAtZero = !useLog;
-      y.ticks.callback = useLog ? pct : (v) => '$' + Number(v).toLocaleString();
-      // log axis otherwise floods with labels — pin a clean handful of values
-      y.afterBuildTicks = useLog
-        ? (axis) => { axis.ticks = LOG_TICKS.filter(v => v >= axis.min && v <= axis.max).map(v => ({ value: v })); }
-        : null;
-      chart.options.plugins.tooltip.callbacks.label = useLog
-        ? (c) => ` ${c.dataset.label}: ${pct(c.parsed.y)}`
-        : (c) => ` ${c.dataset.label}: $${Math.round(c.parsed.y).toLocaleString()}`;
+      if (scaleMode === 'dd') {
+        y.type = 'linear'; y.beginAtZero = false; y.max = 0;
+        y.ticks.callback = (v) => v + '%';
+        y.afterBuildTicks = null;
+        chart.options.plugins.tooltip.callbacks.label =
+          (c) => ` ${c.dataset.label}: ${c.parsed.y.toFixed(1)}%`;
+      } else {
+        const useLog = scaleMode === 'log';
+        y.type = useLog ? 'logarithmic' : 'linear';
+        y.beginAtZero = !useLog; y.max = undefined;
+        y.ticks.callback = useLog ? pct : (v) => '$' + Number(v).toLocaleString();
+        // log axis otherwise floods with labels — pin a clean handful of values
+        y.afterBuildTicks = useLog
+          ? (axis) => { axis.ticks = LOG_TICKS.filter(v => v >= axis.min && v <= axis.max).map(v => ({ value: v })); }
+          : null;
+        chart.options.plugins.tooltip.callbacks.label = useLog
+          ? (c) => ` ${c.dataset.label}: ${pct(c.parsed.y)}`
+          : (c) => ` ${c.dataset.label}: $${Math.round(c.parsed.y).toLocaleString()}`;
+      }
+      draw();
       chart.update();
     }
     document.querySelectorAll('[data-scale]').forEach(btn => {
       btn.addEventListener('click', () => {
-        useLog = btn.dataset.scale === 'log';
+        scaleMode = btn.dataset.scale === 'linear' ? 'lin' : btn.dataset.scale;
         document.querySelectorAll('[data-scale]').forEach(b => b.classList.toggle('active', b === btn));
         applyScale();
       });
     });
 
+    // growth-of-an-investment calculator (follows the selected model)
+    const calcAmt = document.getElementById('calcAmt');
+    function calc() {
+      const out = document.getElementById('calcOut');
+      if (!out || !calcAmt) return;
+      const amt = Math.max(0, parseFloat(calcAmt.value) || 0);
+      const m = d.models.find(x => x.id === current);
+      const rows = [[`${m.name}`, m.unhedged.curve]];
+      if (m.hedged) rows.push([`${m.name} Shield`, m.hedged.curve]);
+      if (m.diversified) rows.push(['Diversified Shield', m.diversified.curve]);
+      rows.push(['S&P 500', d.spy]);
+      out.innerHTML = rows.map(([name, curve]) => {
+        const end = amt * curve[curve.length - 1] / curve[0];
+        return `<div class="cell"><div class="v up">$${Math.round(end).toLocaleString()}</div><div class="k">${name}</div></div>`;
+      }).join('');
+    }
+    if (calcAmt) calcAmt.addEventListener('input', calc);
+
     draw();
     applyScale();   // default = log → % return on the axis
+    calc();
   }
 
 
@@ -386,5 +423,39 @@ const NERODYNE = (() => {
       `<td>${m.probLoss.toFixed(1)}%</td><td class="down">${m.medianMaxDD.toFixed(1)}%</td></tr>`).join('');
   }
 
-  return { load, hero, ticker, modelCards, performance, testing };
+  // homepage stress-year bars: pick 2018 / 2020 / 2022
+  async function bearBars(barsId, pickId) {
+    const d = await load();
+    const wrap = document.getElementById(barsId);
+    if (!wrap) return;
+    const m = d.models.find(x => x.flagship) || d.models[0];
+    function render(year) {
+      const i = d.years.indexOf(year);
+      if (i < 0) return;
+      const rows = [
+        ['Vortex', m.yearly.unhedged[i], C.accent],
+        ['Vortex Shield', m.yearly.hedged[i], C.accent2],
+        ...(m.yearly.diversified ? [['Diversified Shield', m.yearly.diversified[i], C.gold]] : []),
+        ['S&P 500', d.spyYearly[i], C.spy]
+      ];
+      const maxAbs = Math.max(...rows.map(r => Math.abs(r[1]))) || 1;
+      wrap.innerHTML = rows.map(([name, v, col]) => `
+        <div class="bar-row"><span class="lab">${name}</span>
+          <div class="bar-track"><div class="bar-fill" style="background:${col}"></div></div>
+          <span class="val ${v < 0 ? 'down' : 'up'}">${v >= 0 ? '+' : ''}${v.toFixed(1)}%</span></div>`).join('');
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        wrap.querySelectorAll('.bar-fill').forEach((f, j) =>
+          f.style.width = (Math.abs(rows[j][1]) / maxAbs * 100).toFixed(1) + '%');
+      }));
+    }
+    const pick = document.getElementById(pickId);
+    if (pick) pick.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+      pick.querySelectorAll('button').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      render(+b.dataset.y);
+    }));
+    render(2022);
+  }
+
+  return { load, hero, ticker, modelCards, performance, testing, bearBars };
 })();

@@ -566,3 +566,20 @@ section, footer { position: relative; z-index: 1; }
 .model-card { transition: transform .3s ease, border-color .3s, box-shadow .3s; }
 .model-card.picked { border-color: rgba(122,165,236,.55);
   box-shadow: 0 24px 60px -28px rgba(0,0,0,.8), 0 0 0 1px rgba(122,165,236,.35), 0 0 44px -18px rgba(122,165,236,.45); }
+
+
+/* investment calculator */
+.calc-row { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; margin: 14px 0 18px; }
+.calc-row label { font-size: .9rem; color: var(--muted); }
+.calc-input { display: inline-flex; align-items: center; gap: 8px;
+  background: var(--bg); border: 1px solid var(--border-2); border-radius: 12px; padding: 10px 16px; }
+.calc-input span { font-family: var(--mono); color: var(--faint); }
+.calc-input input { background: transparent; border: 0; outline: none; color: var(--text);
+  font-family: var(--mono); font-size: 1.05rem; width: 130px; }
+.calc-input:focus-within { border-color: var(--accent); }
+.calc-grid { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 920px) { .calc-grid { grid-template-columns: 1fr 1fr; } }
+
+/* the CTA arrow belongs on real CTAs, not on selector pills */
+#modelSelect .btn-primary::after { content: none; }
+#modelSelect .btn-primary { transform: none !important; }

@@ -7,7 +7,7 @@
 <meta name="description" content="Full 2012-to-present track record for Vortex, pure and shielded, vs the S&P 500.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style-v3.css">
+<link rel="stylesheet" href="css/style-v4.css">
 <link rel="icon" href="assets/logo.svg">
 </head>
 <body>
@@ -46,6 +46,7 @@
         <div class="toggle" style="font-size:.78rem;">
           <button class="active" data-scale="log">Log</button>
           <button data-scale="linear">$ growth</button>
+          <button data-scale="dd">Drawdown</button>
         </div>
       </div>
     </div>
@@ -57,6 +58,16 @@
     <div class="chart-head"><div class="t">Calendar-year returns</div><span class="note">real per-year %, scale-independent</span></div>
     <div class="chart-wrap" style="height:340px;"><canvas id="yearChart"></canvas></div>
     <p class="note mt-s">Every calendar year of the backtest (2012 and 2026 are partial). This is the clearest read on the year-to-year reality: strong early years, a flat 2015, a near-flat 2022 through the bear market, then a sharp acceleration from 2023. The worst Vortex year was −2.5% in 2022, against −18.2% for the S&amp;P 500.</p>
+  </div>
+
+  <div class="panel mt-l" id="calcPanel">
+    <div class="chart-head"><div class="t">Growth of an investment</div><span class="note">full backtest window, March 2012 to today</span></div>
+    <div class="calc-row">
+      <label for="calcAmt">Invested at the start</label>
+      <div class="calc-input"><span>$</span><input id="calcAmt" type="number" value="10000" min="100" step="500" inputmode="numeric"></div>
+    </div>
+    <div class="stat-grid calc-grid" id="calcOut"></div>
+    <p class="note mt-s">Backtested outcome of the selected model. Figures compound the historical curve shown above; they are not a forecast.</p>
   </div>
 
   <div class="panel mt-l" style="overflow-x:auto;">
@@ -98,7 +109,7 @@
 
 <script src="js/chart.umd.min.js"></script>
 <script src="data/performance.js"></script>
-<script src="js/charts-v5.js"></script>
+<script src="js/charts-v6.js"></script>
 <script src="js/main-v3.js"></script>
 <script>NERODYNE.performance('perfChart', 'perfTable', 'modelSelect', 'yearChart');</script>
 </body>
