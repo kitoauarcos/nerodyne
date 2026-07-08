@@ -54,6 +54,82 @@
     if (e.isIntersecting) { e.target.querySelectorAll('.bar-fill').forEach(f => f.style.width = f.dataset.w + '%'); bio.unobserve(e.target); }
   }), { threshold: 0.4 });
   document.querySelectorAll('.bars').forEach(el => bio.observe(el));
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // scroll progress hairline
+  const prog = document.createElement('div');
+  prog.className = 'scroll-progress';
+  document.body.appendChild(prog);
+  const setProg = () => {
+    const h = document.documentElement;
+    const max = h.scrollHeight - h.clientHeight;
+    prog.style.width = max > 0 ? (h.scrollTop / max * 100) + '%' : '0';
+  };
+  document.addEventListener('scroll', setProg, { passive: true });
+  setProg();
+
+  // pointer-lit panel borders (position vars consumed by .panel::after)
+  if (!reduceMotion) document.addEventListener('pointermove', e => {
+    const panel = e.target.closest && e.target.closest('.panel');
+    if (!panel) return;
+    const r = panel.getBoundingClientRect();
+    panel.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+    panel.style.setProperty('--my', (e.clientY - r.top) + 'px');
+  }, { passive: true });
+
+  // hero constellation — a sparse, slowly drifting signal field
+  const fx = document.getElementById('heroFx');
+  if (fx && !reduceMotion && window.innerWidth > 720) {
+    const ctx = fx.getContext('2d');
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let W, H, pts;
+    const N = 42, LINK = 150;
+    function resize() {
+      const r = fx.parentElement.getBoundingClientRect();
+      W = r.width; H = r.height;
+      fx.width = W * dpr; fx.height = H * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    function seed() {
+      pts = Array.from({ length: N }, () => ({
+        x: Math.random() * W, y: Math.random() * H,
+        vx: (Math.random() - .5) * .18, vy: (Math.random() - .5) * .18,
+        r: Math.random() * 1.4 + .5
+      }));
+    }
+    resize(); seed();
+    window.addEventListener('resize', () => { resize(); seed(); });
+    let running = true;
+    document.addEventListener('visibilitychange', () => { running = !document.hidden; });
+    (function frame() {
+      requestAnimationFrame(frame);
+      if (!running) return;
+      ctx.clearRect(0, 0, W, H);
+      for (const p of pts) {
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < -20) p.x = W + 20; if (p.x > W + 20) p.x = -20;
+        if (p.y < -20) p.y = H + 20; if (p.y > H + 20) p.y = -20;
+      }
+      for (let i = 0; i < N; i++) {
+        for (let j = i + 1; j < N; j++) {
+          const a = pts[i], b = pts[j];
+          const dx = a.x - b.x, dy = a.y - b.y;
+          const d2 = dx * dx + dy * dy;
+          if (d2 < LINK * LINK) {
+            const t = 1 - Math.sqrt(d2) / LINK;
+            ctx.strokeStyle = `rgba(122,165,236,${(t * .16).toFixed(3)})`;
+            ctx.lineWidth = 1;
+            ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke();
+          }
+        }
+      }
+      for (const p of pts) {
+        ctx.fillStyle = 'rgba(140,175,235,.5)';
+        ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.2832); ctx.fill();
+      }
+    })();
+  }
 })();
 
 /* shared formatting helpers (used by charts.js) */

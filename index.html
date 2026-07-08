@@ -7,7 +7,7 @@
 <meta name="description" content="NERODYNE runs systematic equity models built by Nerodyne: 12 years backtested and now one year live. When a model changes its holdings or hedge, you get the exact moves on your phone.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/style-v2.css">
 <link rel="icon" href="assets/logo.svg">
 </head>
 <body>
@@ -35,6 +35,7 @@
 
 <!-- HERO -->
 <section class="hero container">
+  <canvas id="heroFx" class="hero-fx"></canvas>
   <div class="hero-grid">
     <div>
       <span class="eyebrow">Systematic equity research</span>
@@ -222,7 +223,7 @@
 <script src="js/chart.umd.min.js"></script>
 <script src="data/performance.js"></script>
 <script src="js/charts-v4.js"></script>
-<script src="js/main.js"></script>
+<script src="js/main-v2.js"></script>
 <script>NERODYNE.hero('heroChart','heroToggle'); NERODYNE.modelCards('modelScroller');</script>
 </body>
 </html>

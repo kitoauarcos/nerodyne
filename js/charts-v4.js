@@ -4,7 +4,7 @@
    =========================================================================== */
 
 const NERODYNE = (() => {
-  const C = { accent: '#6d97d3', accent2: '#4cbda0', gold: '#c2a568', spy: '#6b7280', grid: 'rgba(255,255,255,.06)', text: '#9aa4b6' };
+  const C = { accent: '#7aa5ec', accent2: '#4cc4a6', gold: '#c2a568', spy: '#6b7280', grid: 'rgba(255,255,255,.06)', text: '#9aa4b6' };
   // stable per-model line colour for multi-model views (muted, print-friendly set)
   const MCOL = { vortex: C.accent, apex: '#c489a4', anchor: '#9a90cc', nova: '#cf9e70', pulse: '#79b6c9', surge: C.gold };
   // which models are publicly shown (data file may hold more)
