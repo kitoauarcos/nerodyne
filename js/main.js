@@ -15,8 +15,11 @@
   });
 
   // ---- scroll reveal that also catches dynamically-added nodes ----
+  // one-shot: reveal once and stop observing, so content never re-fades on scroll
   const io = new IntersectionObserver(entries => {
-    entries.forEach(e => e.target.classList.toggle('in', e.isIntersecting));
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
   }, { threshold: 0.12 });
   const observeAll = (root) => (root.querySelectorAll ? root.querySelectorAll('.reveal:not(.in)') : []).forEach(el => io.observe(el));
   observeAll(document);
@@ -26,15 +29,6 @@
   }))).observe(document.body, { childList: true, subtree: true });
   // expose so charts.js can register freshly-built cards immediately
   window.NEROReveal = observeAll;
-
-  // pointer-tracked glow on feature cards
-  document.addEventListener('pointermove', e => {
-    const card = e.target.closest && e.target.closest('.feature');
-    if (!card) return;
-    const r = card.getBoundingClientRect();
-    card.style.setProperty('--mx', (e.clientX - r.left) + 'px');
-    card.style.setProperty('--my', (e.clientY - r.top) + 'px');
-  });
 
   // ---- count-up animation for [data-count] ----
   function countUp(el) {
@@ -60,17 +54,6 @@
     if (e.isIntersecting) { e.target.querySelectorAll('.bar-fill').forEach(f => f.style.width = f.dataset.w + '%'); bio.unobserve(e.target); }
   }), { threshold: 0.4 });
   document.querySelectorAll('.bars').forEach(el => bio.observe(el));
-
-  // cursor spotlight — ambient glow follows pointer
-  const spot = document.createElement('div');
-  spot.className = 'cursor-spot';
-  document.body.appendChild(spot);
-  let _cx = -9999, _cy = -9999;
-  document.addEventListener('pointermove', e => { _cx = e.clientX; _cy = e.clientY; });
-  (function frame() {
-    spot.style.transform = `translate(${_cx}px,${_cy}px)`;
-    requestAnimationFrame(frame);
-  })();
 })();
 
 /* shared formatting helpers (used by charts.js) */

@@ -4,11 +4,21 @@
    =========================================================================== */
 
 const NERODYNE = (() => {
-  const C = { accent: '#34d399', accent2: '#60a5fa', gold: '#e7c873', spy: '#6b7280', grid: 'rgba(255,255,255,.06)', text: '#99a2b2' };
-  // stable per-model line colour for multi-model views
-  const MCOL = { vortex: C.accent, apex: C.accent, surge: C.gold, anchor: C.accent2 };
+  const C = { accent: '#4cbda0', accent2: '#7d9dd9', gold: '#c2a568', spy: '#6b7280', grid: 'rgba(255,255,255,.06)', text: '#9aa4b6' };
+  // stable per-model line colour for multi-model views (muted, print-friendly set)
+  const MCOL = { vortex: C.accent, apex: '#c489a4', anchor: '#9a90cc', nova: '#cf9e70', pulse: '#6fadc4', surge: C.gold };
   // which models are publicly shown (data file may hold more)
-  const SHOW = ['vortex'];
+  const SHOW = ['vortex', 'apex', 'anchor', 'nova', 'pulse'];
+  // one-line description of what each product is for (shown on the model cards)
+  const BLURB = {
+    'vortex-unhedged': 'The flagship at full strength. Five distinct businesses selected for growing revenue and mutual independence. The highest return profile, with the swings that come with concentration.',
+    'vortex-hedged': 'The same portfolio with a permanent put option overlay. It gives up part of the return in calm markets; in the sample it turned the 2020 and 2022 declines into positive years.',
+    'vortex-diversified': 'A broader book of quality companies with an index hedge, the largest stock in the world by market value, and a dividend ETF sleeve. The steadiest profile, with the shallowest drawdown of the lineup.',
+    'apex-unhedged': 'The most aggressive single model: five momentum leaders. The highest raw return of the pure models, with the deepest drawdowns.',
+    'anchor-unhedged': 'The steadiest single model: ten balanced holdings. The smallest worst year of the four pure models.',
+    'nova-unhedged': 'Five holdings with optimised factor weights. Strong risk-adjusted returns, between Apex’s aggression and Anchor’s breadth.',
+    'pulse-unhedged': 'Five holdings refreshed quarterly, so the portfolio stays current. The shallowest maximum drawdown of the pure models.'
+  };
   let _data = null;
 
   async function load() {
@@ -73,11 +83,10 @@ const NERODYNE = (() => {
     const d = await load();
 
     // headline stats first, so they always populate regardless of the chart
-    const apex = d.models.find(m => m.flagship) || d.models[0];
-    const bestSharpe = Math.max(...d.models.map(m => m.unhedged.stats.sharpe));
-    countTo('hero-total', apex.unhedged.stats.total * 100, { pre: '+', suf: '%' });
-    countTo('hero-ann', apex.unhedged.stats.ann, { dp: 1, pre: '+', suf: '%' });
-    countTo('hero-sharpe', bestSharpe, { dp: 2 });
+    const flag = d.models.find(m => m.flagship) || d.models[0];
+    countTo('hero-total', flag.unhedged.stats.total * 100, { pre: '+', suf: '%' });
+    countTo('hero-ann', flag.unhedged.stats.ann, { dp: 1, pre: '+', suf: '%' });
+    countTo('hero-sharpe', flag.unhedged.stats.sharpe, { dp: 2 });
     if (d.lastUpdated) setText('hero-updated', new Date(d.lastUpdated).toLocaleDateString());
 
     const ctx = document.getElementById(canvasId);
@@ -88,7 +97,8 @@ const NERODYNE = (() => {
     const chart = new Chart(ctx, { type: 'line', data: { labels, datasets: [] }, options: baseOpts(true) });
 
     function draw() {
-      const sets = d.models.map(m => {
+      // pure models carry no hedged curve — only draw models that have the view
+      const sets = d.models.filter(m => m[view]).map(m => {
         const col = MCOL[m.id] || C.accent;
         const fill = m.flagship;
         return { ...ds(`${m.name}`, m[view].curve, col, fill), borderWidth: m.flagship ? 2.6 : 1.8 };
@@ -123,22 +133,27 @@ const NERODYNE = (() => {
     el.innerHTML = `<div class="ticker-track">${html}${html}</div>`; // duplicated for seamless loop
   }
 
-  // Two fixed product cards: the unhedged strategy and its hedged ("Shield") version.
+  // Product cards: the flagship's three versions, then each pure underlying model.
   async function modelCards(containerId) {
     const d = await load();
     const wrap = document.getElementById(containerId);
     if (!wrap) return;
-    const m = d.models.find(x => x.flagship) || d.models[0];
+    const flag = d.models.find(x => x.flagship) || d.models[0];
     const variants = [
-      { key: 'unhedged', name: m.name, tag: 'unhedged · concentrated · highest return', col: C.accent, badge: 'Pure' },
-      { key: 'hedged', name: `${m.name} Shield`, tag: 'hedged · concentrated · convex protection', col: C.accent2, badge: 'Hedged' },
-      { key: 'diversified', name: 'Diversified Shield', tag: 'hedged · 15+ holdings · lowest drawdown', col: C.gold, badge: 'Diversified' }
-    ].filter(v => m[v.key]);
+      { m: flag, key: 'unhedged', name: flag.name, tag: 'unhedged · concentrated · highest return', col: C.accent, badge: 'Pure' },
+      { m: flag, key: 'hedged', name: `${flag.name} Shield`, tag: 'hedged · concentrated · convex protection', col: C.accent2, badge: 'Hedged' },
+      { m: flag, key: 'diversified', name: 'Diversified Shield', tag: 'hedged · 15+ quality holdings · dividend ETF sleeve', col: C.gold, badge: 'Diversified' }
+    ].filter(v => v.m[v.key]);
+    d.models.filter(x => !x.flagship).forEach(pm => {
+      variants.push({ m: pm, key: 'unhedged', name: pm.name, tag: pm.tagline || 'unhedged single model', col: MCOL[pm.id] || C.accent, badge: 'Model' });
+    });
     variants.forEach((vt, i) => {
+      const m = vt.m;
       const cid = `${m.id}-${vt.key}`;
       const card = document.createElement('div');
       card.className = 'panel model-card reveal';
       card.setAttribute('data-d', String(i + 1));
+      const blurb = BLURB[cid] || '';
       card.innerHTML = `
         <div class="mc-head">
           <div>
@@ -147,6 +162,7 @@ const NERODYNE = (() => {
           </div>
           <span class="badge">${vt.badge}</span>
         </div>
+        ${blurb ? `<p class="mc-desc">${blurb}</p>` : ''}
         <div class="mc-spark"><canvas id="spark-${cid}"></canvas></div>
         <div class="stat-grid" id="stats-${cid}"></div>`;
       wrap.appendChild(card);
@@ -212,8 +228,8 @@ const NERODYNE = (() => {
       if (!yearChart) return;
       const m = d.models.find(x => x.id === current);
       yearChart.data.datasets = [
-        { label: `${m.name} · unhedged`, data: m.yearly.unhedged, backgroundColor: C.accent, borderRadius: 3 },
-        { label: `${m.name} Shield`, data: m.yearly.hedged, backgroundColor: C.accent2, borderRadius: 3 },
+        { label: `${m.name} · unhedged`, data: m.yearly.unhedged, backgroundColor: MCOL[m.id] || C.accent, borderRadius: 3 },
+        ...(m.yearly.hedged ? [{ label: `${m.name} Shield`, data: m.yearly.hedged, backgroundColor: C.accent2, borderRadius: 3 }] : []),
         ...(m.yearly.diversified ? [{ label: 'Diversified Shield', data: m.yearly.diversified, backgroundColor: C.gold, borderRadius: 3 }] : []),
         { label: 'S&P 500', data: d.spyYearly, backgroundColor: C.spy, borderRadius: 3 }
       ];
@@ -223,8 +239,8 @@ const NERODYNE = (() => {
     function draw() {
       const m = d.models.find(x => x.id === current);
       const sets = [];
-      if (showUnhedged) sets.push(ds(`${m.name} · unhedged`, m.unhedged.curve, C.accent));
-      if (showHedged) sets.push(ds(`${m.name} Shield`, m.hedged.curve, C.accent2));
+      if (showUnhedged) sets.push(ds(`${m.name} · unhedged`, m.unhedged.curve, MCOL[m.id] || C.accent));
+      if (showHedged && m.hedged) sets.push(ds(`${m.name} Shield`, m.hedged.curve, C.accent2));
       if (m.diversified) sets.push(ds('Diversified Shield', m.diversified.curve, C.gold));
       if (showSpy) sets.push(ds('S&P 500', d.spy, C.spy));
       chart.data.labels = m.dates; chart.data.datasets = sets; chart.update();
@@ -238,7 +254,7 @@ const NERODYNE = (() => {
           <td>+${Math.round(s.total * 100).toLocaleString()}%</td></tr>`;
         tbl.querySelector('tbody').innerHTML =
           row(`${m.name} (unhedged)`, m.unhedged.stats) +
-          row(`${m.name} Shield`, m.hedged.stats) +
+          (m.hedged ? row(`${m.name} Shield`, m.hedged.stats) : '') +
           (m.diversified ? row('Diversified Shield', m.diversified.stats) : '') +
           `<tr><td>S&amp;P 500 (SPY)</td><td class="up">+${d.spyStats.ann.toFixed(1)}%</td>
             <td>${d.spyStats.vol.toFixed(1)}%</td><td>${d.spyStats.sharpe.toFixed(2)}</td>
