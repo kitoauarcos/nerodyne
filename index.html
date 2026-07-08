@@ -7,7 +7,7 @@
 <meta name="description" content="NERODYNE runs systematic equity models built by Nerodyne: 12 years backtested and now one year live. When a model changes its holdings or hedge, you get the exact moves on your phone.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style-v5.css">
+<link rel="stylesheet" href="css/style-v6.css">
 <link rel="icon" href="assets/logo.svg">
 </head>
 <body>
@@ -34,10 +34,12 @@
 </header>
 
 <!-- HERO -->
-<section class="hero container">
+<div class="zoom-track" id="zoomTrack">
+<div class="zoom-stage">
+<section class="scene hero">
   <canvas id="heroFx" class="hero-fx"></canvas>
   <div class="scroll-cue">Scroll</div>
-  <div class="hero-grid">
+  <div class="hero-grid container">
     <div>
       <span class="eyebrow">Systematic equity research</span>
       <h1>A systematic equity strategy,<br><span class="gradient-text">delivered as research.</span></h1>
@@ -85,7 +87,7 @@
 
 
 <!-- THE MODEL JOURNEY -->
-<section class="chapter" data-ch="vortex">
+<section class="scene chapter" data-ch="vortex">
   <div class="ch-num">01</div>
   <div class="container ch-inner">
     <span class="ch-idx">01 &middot; The flagship</span>
@@ -97,7 +99,7 @@
   </div>
 </section>
 
-<section class="chapter" data-ch="shield">
+<section class="scene chapter" data-ch="shield">
   <div class="ch-num">02</div>
   <div class="container ch-inner">
     <span class="ch-idx">02 &middot; Protected</span>
@@ -109,7 +111,7 @@
   </div>
 </section>
 
-<section class="chapter" data-ch="diversified">
+<section class="scene chapter" data-ch="diversified">
   <div class="ch-num">03</div>
   <div class="container ch-inner">
     <span class="ch-idx">03 &middot; Steady</span>
@@ -120,6 +122,8 @@
     <div class="ch-cta"><a href="testing.html" class="btn btn-ghost">How it is tested</a></div>
   </div>
 </section>
+</div>
+</div>
 
 <!-- WHAT YOU GET / HOW IT REACHES YOU -->
 <section class="container">
@@ -274,7 +278,7 @@
 <script src="js/chart.umd.min.js"></script>
 <script src="data/performance.js"></script>
 <script src="js/charts-v7.js"></script>
-<script src="js/main-v4.js"></script>
+<script src="js/main-v5.js"></script>
 <script>NERODYNE.hero('heroChart','heroToggle'); NERODYNE.journey(); NERODYNE.modelCards('modelScroller','pure'); NERODYNE.bearBars('bearBars','bearPick');</script>
 </body>
 </html>

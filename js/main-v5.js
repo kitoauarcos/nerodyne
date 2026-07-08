@@ -102,35 +102,58 @@
     }, true);
   }
 
-  // scroll-depth engine: chapters scale/fade as you dive past them,
-  // watermark numbers parallax at a slower rate
-  const chapters = Array.from(document.querySelectorAll('.chapter'));
-  if (chapters.length && !reduceMotion) {
+  // z-axis fly-through: scroll dollies the camera through the homepage scenes
+  const track = document.getElementById('zoomTrack');
+  const scenes = track ? Array.from(track.querySelectorAll('.scene')) : [];
+  if (track && scenes.length > 1 && !reduceMotion && window.innerWidth > 920) {
+    document.documentElement.classList.add('zoom-on');
+    track.style.height = (scenes.length * 130) + 'vh';
+
+    // progress dots
+    const dots = document.createElement('div');
+    dots.className = 'scene-dots';
+    dots.innerHTML = scenes.map(() => '<span></span>').join('');
+    document.body.appendChild(dots);
+    const dotEls = Array.from(dots.children);
+
+    const SP = 1500;   // z distance between scenes, px
     let ticking = false;
     const update = () => {
       ticking = false;
       const vh = window.innerHeight;
-      chapters.forEach(ch => {
-        const r = ch.getBoundingClientRect();
-        if (r.bottom < -vh || r.top > vh * 2) return;
-        const t = Math.max(-1, Math.min(1, (r.top + r.height / 2 - vh / 2) / vh));
-        const inner = ch.querySelector('.ch-inner');
-        const num = ch.querySelector('.ch-num');
-        if (inner) {
-          inner.style.transform = `translateY(${(t * -46).toFixed(1)}px) scale(${(1 - Math.abs(t) * .1).toFixed(3)})`;
-          inner.style.opacity = (1 - Math.abs(t) * .85).toFixed(3);
-        }
-        if (num) {
-          num.style.transform = `translateY(calc(-50% + ${(t * 150).toFixed(1)}px))`;
-          num.style.opacity = (0.95 - Math.abs(t) * .75).toFixed(3);
-        }
+      const top = track.offsetTop;
+      const span = (track.offsetHeight - vh) / (scenes.length - 1);
+      const p = Math.max(0, Math.min(scenes.length - 1, (window.scrollY - top) / span));
+      scenes.forEach((sc, i) => {
+        const d = i - p;                    // >0 still ahead (deep), <0 already passed
+        const z = -d * SP;
+        let op;
+        if (d >= 0) op = 1 - Math.min(1, Math.max(0, (d - .1) / .8));
+        else op = 1 - Math.min(1, -d * 2.6);
+        sc.style.transform = 'translateZ(' + z.toFixed(1) + 'px)';
+        sc.style.opacity = op.toFixed(3);
+        sc.style.visibility = op <= 0.02 ? 'hidden' : 'visible';
+        sc.style.pointerEvents = Math.abs(d) < .45 ? 'auto' : 'none';
       });
+      const active = Math.round(p);
+      dotEls.forEach((el, i) => el.classList.toggle('on', i === active));
+      // hide the dots once the fly-through is behind us
+      const r = track.getBoundingClientRect();
+      dots.classList.toggle('gone', r.bottom < vh * .6);
     };
     document.addEventListener('scroll', () => {
       if (!ticking) { ticking = true; requestAnimationFrame(update); }
     }, { passive: true });
     window.addEventListener('resize', update);
     update();
+    // clicking a dot flies to that scene
+    dotEls.forEach((el, i) => {
+      el.style.cursor = 'pointer'; el.style.pointerEvents = 'auto';
+      el.addEventListener('click', () => {
+        const span = (track.offsetHeight - window.innerHeight) / (scenes.length - 1);
+        window.scrollTo({ top: track.offsetTop + span * i, behavior: 'smooth' });
+      });
+    });
   }
 
   // hero constellation — a sparse, slowly drifting signal field
