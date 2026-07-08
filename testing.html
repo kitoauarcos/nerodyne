@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Performance · NERODYNE</title>
+<title>How it is tested · NERODYNE</title>
 <meta name="description" content="Full 2012-to-present track record for Vortex, pure and shielded, vs the S&P 500.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
@@ -27,59 +27,51 @@
 </header>
 
 <section class="page-hero container">
-  <span class="eyebrow">Track record · 2012 to present</span>
-  <h1>The numbers, in full.</h1>
-  <p class="lead">Every model on the full sample, against the S&amp;P 500: the flagship Vortex with its hedged and diversified versions, and the four pure models Apex, Anchor, Nova and Pulse. Select a model below. Growth of $100 invested at the start.</p>
+  <span class="eyebrow">Methodology</span>
+  <h1>How the models are tested.</h1>
+  <p class="lead">Before a model is offered to subscribers it is evaluated on more than a decade of historical data, under rules designed to prevent the most common backtesting errors. This page describes that process and shows the results of the stress tests and simulations.</p>
 </section>
 
 <section class="container" style="padding-top:24px;">
-  <div id="modelSelect" class="hero-cta" style="margin-bottom:18px;"></div>
-  <div class="panel chart-card">
-    <div class="chart-head" style="gap:14px;flex-wrap:wrap;">
-      <div class="t">Growth of $100</div>
-      <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
-        <label class="note" style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
-          <span style="color:var(--accent)"><input type="checkbox" data-series="unhedged" checked> Unhedged</span>
-          <span style="color:var(--accent-2)"><input type="checkbox" data-series="hedged" checked> Hedged</span>
-          <span style="color:var(--spy)"><input type="checkbox" data-series="spy" checked> S&amp;P 500</span>
-        </label>
-        <div class="toggle" style="font-size:.78rem;">
-          <button class="active" data-scale="log">Log</button>
-          <button data-scale="linear">$ growth</button>
-        </div>
-      </div>
-    </div>
-    <div class="chart-wrap" style="height:420px;"><canvas id="perfChart"></canvas></div>
-    <p class="note mt-s">Showing <b>Log</b> by default: the axis is cumulative <b>% return</b>, and equal vertical steps mean equal percentage moves, which is the correct way to read a multi-year compounding curve and keeps the steady gap over the S&amp;P 500 visible. Switch to <b>$ growth</b> for the dollar value of $100 invested (which makes recent years dominate the view).</p>
+  <div class="section-head"><span class="eyebrow">Backtest discipline</span><h2>Point in time, no hindsight</h2><div class="kicker-line"></div></div>
+  <div class="grid-3">
+    <div class="panel feature reveal" data-d="1"><h3>Point in time fundamentals</h3><p>Every fundamental figure is used only from the date its SEC filing became public. If a company restated results later, the backtest still sees what an investor saw at the time. Nothing in a selection decision uses information from after the decision date.</p></div>
+    <div class="panel feature reveal" data-d="2"><h3>Realistic constraints</h3><p>The universe is limited to US listed companies with at least $1B market value and $5M average daily volume, so every position could genuinely have been traded at the tested size. Financials and other hard to model sectors are excluded.</p></div>
+    <div class="panel feature reveal" data-d="3"><h3>Rules fixed in advance</h3><p>The models follow a fixed schedule and a fixed ruleset. There is no discretionary override in the backtest, and the same code that produced the historical results produces the live signals.</p></div>
+    <div class="panel feature reveal" data-d="1"><h3>Quality filters re-checked</h3><p>Revenue growth and stability are verified at every rebalance from the filing record, including a check against each company's own revenue history that catches restatements and divestitures a simple growth figure would miss.</p></div>
+    <div class="panel feature reveal" data-d="2"><h3>Hedge priced explicitly</h3><p>Every put option in the hedged versions is priced with a standard option model, including volatility skew, at the moment it would have been bought. Premiums are paid in full in the results; payoffs occur only when the market actually fell through the strikes.</p></div>
+    <div class="panel feature reveal" data-d="3"><h3>Known limitations</h3><p>Backtested results are not live trading: they benefit from hindsight in research design, option prices are model based rather than quoted, and transaction costs beyond the bid ask of liquid names are not modelled. Roughly one year of the record is live operation.</p></div>
   </div>
+</section>
 
-  <div class="panel mt-l">
-    <div class="chart-head"><div class="t">Calendar-year returns</div><span class="note">real per-year %, scale-independent</span></div>
-    <div class="chart-wrap" style="height:340px;"><canvas id="yearChart"></canvas></div>
-    <p class="note mt-s">Every calendar year of the backtest (2012 and 2026 are partial). This is the clearest read on the year-to-year reality: strong early years, a flat 2015, a near-flat 2022 through the bear market, then a sharp acceleration from 2023. The worst Vortex year was −2.5% in 2022, against −18.2% for the S&amp;P 500.</p>
-  </div>
-
-  <div class="panel mt-l" style="overflow-x:auto;">
-    <h3 style="margin-bottom:16px;">Key statistics</h3>
-    <table class="tbl" id="perfTable">
-      <thead><tr><th>Strategy</th><th>Annualised</th><th>Volatility</th><th>Sharpe</th><th>Max drawdown</th><th>Worst year</th><th>Total return</th></tr></thead>
+<section class="container">
+  <div class="section-head"><span class="eyebrow">Stress tests</span><h2>The weakest markets of the sample</h2><p class="lead">How each version behaved through the three sharpest declines in the period, measured peak to trough. The S&amp;P 500 column is the same window for comparison.</p><div class="kicker-line"></div></div>
+  <div class="panel" style="overflow-x:auto;">
+    <table class="tbl" id="stressTable">
+      <thead><tr><th>Episode</th><th>Vortex</th><th>Vortex Shield</th><th>Diversified Shield</th><th>S&amp;P 500</th></tr></thead>
       <tbody></tbody>
     </table>
-    <p class="note mt-s">Vortex Shield adds per-stock earnings puts plus an index (QQQ) put ladder. The hedge trades a little annualised return for a shallower deepest drawdown, and in a crash year like 2022 it can swing hard in your favour (+26% hedged vs +3.5% pure).</p>
+    <p class="note mt-s">Peak to trough returns over each window, from the same equity curves shown on the performance page. In fast crashes the books initially fall with the market; the hedge&#39;s convex payoff shows up in deeper and longer declines, most clearly the 2022 bear market, and in the calendar year outcomes on the performance page (Vortex Shield: 2020 +64%, 2022 +16%).</p>
   </div>
+</section>
 
-  <div class="panel glow mt-l reveal" style="border-left:3px solid var(--accent-2);">
-    <span class="badge blue">Read this before you pick</span>
-    <h3 class="mt-s">Why unhedged looks better here, and when it won't</h3>
-    <p class="mt-s">Over this sample the <b style="color:var(--accent)">unhedged</b> version wins on total return, and that is real. But remember <i>what</i> this period was: one of the strongest bull runs in market history, led by US tech and the Nasdaq. In that environment, paying for protection you rarely needed was a drag.</p>
-    <p class="mt-s">That backdrop will not last forever. The <b style="color:var(--accent-2)">hedged</b> version is built for the years this sample barely contains: a deep, sustained crash. When one arrives, the unhedged curve takes the full hit while the hedge is designed to cushion it. Look less at which line ends higher, and more at the <b>worst-year</b> and <b>max-drawdown</b> columns above. That gap is what you are buying.</p>
-    <p class="note mt-s">Rule of thumb: chasing maximum return in calm markets favours Vortex; surviving a genuine bear market favours Vortex Shield. You can switch anytime.</p>
+<section class="container">
+  <div class="section-head"><span class="eyebrow">Monte Carlo simulation</span><h2>Five thousand simulated years</h2><p class="lead">A block bootstrap simulation: one year paths are assembled from randomly drawn 20 day blocks of each strategy's own daily returns, preserving short term clustering. The table shows the distribution of 5,000 simulated years.</p><div class="kicker-line"></div></div>
+  <div class="panel" style="overflow-x:auto;">
+    <table class="tbl" id="mcTable">
+      <thead><tr><th>Strategy</th><th>Median year</th><th>5th percentile</th><th>95th percentile</th><th>Chance of a losing year</th><th>Median max drawdown</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <p class="note mt-s">Simulation resamples the historical return distribution; it cannot produce market conditions the sample never contained, and it is not a forecast. It shows how sensitive each strategy's outcome is to the ordering of returns.</p>
   </div>
+</section>
 
-  <div class="cta-band mt-l reveal">
-    <h2>Follow the model automatically</h2>
-    <p class="lead" style="margin:14px auto 26px;">Request access and get each rebalance and weekly update on your phone the day we launch — with 2 months free and 30% off for life.</p>
-    <a href="signup.html" class="btn btn-primary btn-lg">Request access</a>
+<section class="container">
+  <div class="cta-band reveal">
+    <span class="eyebrow">Full results</span>
+    <h2 class="mt-s">The complete track record</h2>
+    <p class="lead" style="margin:14px auto 26px;">Every calendar year, every version, against the S&amp;P 500, with drawdowns and worst years disclosed in full.</p>
+    <a href="performance.html" class="btn btn-primary btn-lg">Review the performance page</a>
   </div>
 </section>
 
@@ -95,11 +87,9 @@
     <p class="copyright">© <span data-year></span> Nerodyne. All rights reserved.</p>
   </div>
 </footer>
-
-<script src="js/chart.umd.min.js"></script>
 <script src="data/performance.js"></script>
 <script src="js/charts-v4.js"></script>
 <script src="js/main.js"></script>
-<script>NERODYNE.performance('perfChart', 'perfTable', 'modelSelect', 'yearChart');</script>
+<script>NERODYNE.testing('stressTable','mcTable');</script>
 </body>
 </html>

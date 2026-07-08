@@ -4,9 +4,9 @@
    =========================================================================== */
 
 const NERODYNE = (() => {
-  const C = { accent: '#4cbda0', accent2: '#7d9dd9', gold: '#c2a568', spy: '#6b7280', grid: 'rgba(255,255,255,.06)', text: '#9aa4b6' };
+  const C = { accent: '#6d97d3', accent2: '#4cbda0', gold: '#c2a568', spy: '#6b7280', grid: 'rgba(255,255,255,.06)', text: '#9aa4b6' };
   // stable per-model line colour for multi-model views (muted, print-friendly set)
-  const MCOL = { vortex: C.accent, apex: '#c489a4', anchor: '#9a90cc', nova: '#cf9e70', pulse: '#6fadc4', surge: C.gold };
+  const MCOL = { vortex: C.accent, apex: '#c489a4', anchor: '#9a90cc', nova: '#cf9e70', pulse: '#79b6c9', surge: C.gold };
   // which models are publicly shown (data file may hold more)
   const SHOW = ['vortex', 'apex', 'anchor', 'nova', 'pulse'];
   // one-line description of what each product is for (shown on the model cards)
@@ -95,6 +95,13 @@ const NERODYNE = (() => {
     let view = 'unhedged';
 
     const chart = new Chart(ctx, { type: 'line', data: { labels, datasets: [] }, options: baseOpts(true) });
+    // the hero axis shows cumulative % return, not dollars
+    const pct = (v) => (v >= 100 ? '+' : '') + Math.round((v / 100 - 1) * 100).toLocaleString() + '%';
+    const HERO_TICKS = [100, 300, 1000, 3000, 10000, 30000];
+    const hy = chart.options.scales.y;
+    hy.ticks.callback = pct;
+    hy.afterBuildTicks = (axis) => { axis.ticks = HERO_TICKS.filter(v => v >= axis.min && v <= axis.max).map(v => ({ value: v })); };
+    chart.options.plugins.tooltip.callbacks.label = (c) => ` ${c.dataset.label}: ${pct(c.parsed.y)}`;
 
     function draw() {
       // pure models carry no hedged curve — only draw models that have the view
@@ -317,5 +324,23 @@ const NERODYNE = (() => {
     applyScale();   // default = log → % return on the axis
   }
 
-  return { load, hero, ticker, modelCards, performance };
+
+  // "How it's tested" page: stress-window and Monte Carlo tables
+  async function testing(stressId, mcId) {
+    const d = await load();
+    const t = d.testing; if (!t) return;
+    const cell = v => v == null ? '<td>n/a</td>'
+      : `<td class="${v < 0 ? 'down' : 'up'}">${v >= 0 ? '+' : ''}${v.toFixed(1)}%</td>`;
+    const st = document.getElementById(stressId);
+    if (st) st.querySelector('tbody').innerHTML = t.stress.map(r =>
+      `<tr><td>${r.name}<div class="note">${r.from} to ${r.to}</div></td>` +
+      cell(r.vortex) + cell(r.hedged) + cell(r.diversified) + cell(r.spy) + '</tr>').join('');
+    const NAMES = { vortex: 'Vortex', hedged: 'Vortex Shield', diversified: 'Diversified Shield', spy: 'S&P 500' };
+    const mc = document.getElementById(mcId);
+    if (mc) mc.querySelector('tbody').innerHTML = Object.entries(t.mc).map(([k, m]) =>
+      `<tr><td>${NAMES[k] || k}</td>` + cell(m.p50) + cell(m.p5) + cell(m.p95) +
+      `<td>${m.probLoss.toFixed(1)}%</td><td class="down">${m.medianMaxDD.toFixed(1)}%</td></tr>`).join('');
+  }
+
+  return { load, hero, ticker, modelCards, performance, testing };
 })();
