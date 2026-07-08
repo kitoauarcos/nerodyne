@@ -6,8 +6,8 @@
 <title>NERODYNE · Systematic equity models, delivered to your phone</title>
 <meta name="description" content="NERODYNE runs systematic equity models built by Nerodyne: 12 years backtested and now one year live. When a model changes its holdings or hedge, you get the exact moves on your phone.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style-v2.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style-v3.css">
 <link rel="icon" href="assets/logo.svg">
 </head>
 <body>
@@ -57,6 +57,7 @@
       </div>
     </div>
     <div class="panel chart-card glow">
+      <div class="term-bar"><span></span><span></span><span></span><em>VORTEX vs SPX &middot; 2012 to 2026</em></div>
       <div class="chart-head">
         <div>
           <div class="t">Vortex vs the S&amp;P 500</div>
@@ -68,6 +69,14 @@
         </div>
       </div>
       <div class="chart-wrap"><canvas id="heroChart"></canvas></div>
+      <div class="range-row">
+        <div class="toggle" id="heroRange" style="font-size:.72rem;">
+          <button class="active" data-r="all">All</button>
+          <button data-r="5">5Y</button>
+          <button data-r="3">3Y</button>
+          <button data-r="1">1Y</button>
+        </div>
+      </div>
       <div class="chart-meta"><span>Backtested from March 2012</span><span>Data updated <span id="hero-updated">…</span></span></div>
     </div>
   </div>
@@ -125,6 +134,11 @@
     <p class="lead">The flagship <b>Vortex</b> strategy is offered in three versions that span a range from highest return to lowest drawdown: unhedged <b>Vortex</b>, the concentrated <b>Vortex Shield</b>, and the broader <b>Diversified Shield</b>. Alongside them, the four underlying pure models it draws from, <b>Apex</b>, <b>Anchor</b>, <b>Nova</b> and <b>Pulse</b>, are available unhedged. All figures below are full sample backtests from 2012 to the present.</p>
     <div class="kicker-line"></div>
   </div>
+  <div class="picker" id="profilePicker">
+    <button data-p="growth">Maximum growth</button>
+    <button data-p="protected">Crash protected</button>
+    <button data-p="steady">Steady and broad</button>
+  </div>
   <div class="models-scroller" id="modelScroller"></div>
   <p class="note">The first three cards are the flagship's risk profiles, higher return with deeper drawdowns through to lower return with shallower drawdowns. The remaining cards are single pure models. You choose the profile that suits you.</p>
 </section>
@@ -163,7 +177,7 @@
 
 <!-- FEATURES -->
 <section class="container">
-  <div class="grid-3">
+  <div class="grid-3 bento">
     <div class="panel feature reveal" data-d="1"><h3>Timely updates</h3><p>The portfolio changes infrequently. When it does, subscribers are notified promptly by Telegram or email.</p></div>
     <div class="panel feature reveal" data-d="2"><h3>Defined hedge</h3><p>An optional put option overlay intended to reduce losses in a market decline. Available as a separate version.</p></div>
     <div class="panel feature reveal" data-d="3"><h3>12 years backtested, 1 year live</h3><p>Presented on the full sample from 2012 to the present, hedged and unhedged, against the S&amp;P 500, with the most recent year run live.</p></div>
@@ -222,8 +236,8 @@
 
 <script src="js/chart.umd.min.js"></script>
 <script src="data/performance.js"></script>
-<script src="js/charts-v4.js"></script>
-<script src="js/main-v2.js"></script>
+<script src="js/charts-v5.js"></script>
+<script src="js/main-v3.js"></script>
 <script>NERODYNE.hero('heroChart','heroToggle'); NERODYNE.modelCards('modelScroller');</script>
 </body>
 </html>

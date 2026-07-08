@@ -78,6 +78,30 @@
     panel.style.setProperty('--my', (e.clientY - r.top) + 'px');
   }, { passive: true });
 
+  // pointer tilt on model cards + magnetic primary buttons (fine pointers only)
+  if (!reduceMotion && matchMedia('(pointer:fine)').matches) {
+    document.addEventListener('pointermove', e => {
+      const card = e.target.closest && e.target.closest('.model-card');
+      if (card) {
+        const r = card.getBoundingClientRect();
+        const rx = ((e.clientY - r.top) / r.height - .5) * -4;
+        const ry = ((e.clientX - r.left) / r.width - .5) * 5;
+        card.style.transform = `perspective(900px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
+      }
+      const btn = e.target.closest && e.target.closest('.btn-primary');
+      if (btn) {
+        const r = btn.getBoundingClientRect();
+        btn.style.transform = `translate(${(((e.clientX - r.left) / r.width) - .5) * 6}px, ${(((e.clientY - r.top) / r.height) - .5) * 4}px)`;
+      }
+    }, { passive: true });
+    document.addEventListener('pointerout', e => {
+      const card = e.target.closest && e.target.closest('.model-card');
+      if (card && !card.contains(e.relatedTarget)) card.style.transform = '';
+      const btn = e.target.closest && e.target.closest('.btn-primary');
+      if (btn && !btn.contains(e.relatedTarget)) btn.style.transform = '';
+    }, true);
+  }
+
   // hero constellation — a sparse, slowly drifting signal field
   const fx = document.getElementById('heroFx');
   if (fx && !reduceMotion && window.innerWidth > 720) {

@@ -97,23 +97,46 @@ const NERODYNE = (() => {
     const chart = new Chart(ctx, { type: 'line', data: { labels, datasets: [] }, options: baseOpts(true) });
     // the hero axis shows cumulative % return, not dollars
     const pct = (v) => (v >= 100 ? '+' : '') + Math.round((v / 100 - 1) * 100).toLocaleString() + '%';
-    const HERO_TICKS = [100, 300, 1000, 3000, 10000, 30000];
+    const HERO_TICKS = [100, 120, 150, 200, 300, 500, 1000, 3000, 10000, 30000];
     const hy = chart.options.scales.y;
     hy.ticks.callback = pct;
-    hy.afterBuildTicks = (axis) => { axis.ticks = HERO_TICKS.filter(v => v >= axis.min && v <= axis.max).map(v => ({ value: v })); };
+    hy.afterBuildTicks = (axis) => {
+      let t = HERO_TICKS.filter(v => v >= axis.min && v <= axis.max);
+      const step = Math.ceil(t.length / 6);
+      if (step > 1) t = t.filter((_, i) => i % step === 0);
+      axis.ticks = t.map(v => ({ value: v }));
+    };
     chart.options.plugins.tooltip.callbacks.label = (c) => ` ${c.dataset.label}: ${pct(c.parsed.y)}`;
 
+    let from = 0;   // window start index (range selector), curves rebased to 100
     function draw() {
-      // pure models carry no hedged curve — only draw models that have the view
-      const sets = d.models.filter(m => m[view]).map(m => {
-        const col = MCOL[m.id] || C.accent;
-        const fill = m.flagship;
-        return { ...ds(`${m.name}`, m[view].curve, col, fill), borderWidth: m.flagship ? 2.6 : 1.8 };
-      });
-      sets.push(ds('S&P 500', d.spy, C.spy));
-      chart.data.datasets = sets; chart.update();
+      // the hero stays readable: flagship vs the index only (all models live on the performance page)
+      const flag = d.models.find(m => m.flagship && m[view]) || d.models[0];
+      const rebase = arr => { const w = arr.slice(from); const b = w[0] || 100; return w.map(v => v / b * 100); };
+      chart.data.labels = labels.slice(from);
+      chart.data.datasets = [
+        { ...ds(`${flag.name}`, rebase(flag[view].curve), MCOL[flag.id] || C.accent, true), borderWidth: 2.6 },
+        ds('S&P 500', rebase(d.spy), C.spy)
+      ];
+      chart.update();
     }
     draw();
+
+    const rangeWrap = document.getElementById('heroRange');
+    if (rangeWrap) rangeWrap.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+      rangeWrap.querySelectorAll('button').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      const yrs = b.dataset.r === 'all' ? 0 : +b.dataset.r;
+      if (!yrs) { from = 0; }
+      else {
+        const cut = new Date(labels[labels.length - 1]);
+        cut.setFullYear(cut.getFullYear() - yrs);
+        const iso = cut.toISOString().slice(0, 10);
+        const i = labels.findIndex(dt => dt >= iso);
+        from = i < 0 ? 0 : i;
+      }
+      draw();
+    }));
 
     const tog = document.getElementById(toggleId);
     if (tog) tog.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
@@ -193,6 +216,27 @@ const NERODYNE = (() => {
         <div class="cell"><div class="v ${s.worst < 0 ? 'down' : 'up'}">${s.worst >= 0 ? '+' : ''}${s.worst.toFixed(1)}%</div><div class="k">Worst year</div></div>
         <div class="cell"><div class="v down">${s.maxdd.toFixed(1)}%</div><div class="k">Max drawdown</div></div>`;
     });
+
+    // risk-profile picker: highlight + scroll to the matching card
+    const picker = document.getElementById('profilePicker');
+    if (picker) {
+      const map = {
+        growth: `${flag.id}-unhedged`,
+        protected: `${flag.id}-hedged`,
+        steady: `${flag.id}-diversified`
+      };
+      picker.querySelectorAll('button').forEach(b => b.addEventListener('click', () => {
+        picker.querySelectorAll('button').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        wrap.querySelectorAll('.model-card').forEach(c => c.classList.remove('picked'));
+        const spark = document.getElementById(`spark-${map[b.dataset.p]}`);
+        const card = spark && spark.closest('.model-card');
+        if (card) {
+          card.classList.add('picked');
+          card.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }
+      }));
+    }
   }
 
   // Full performance page: switchable growth chart + log/linear toggle + year bars + stats table.
