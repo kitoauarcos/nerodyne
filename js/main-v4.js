@@ -102,6 +102,37 @@
     }, true);
   }
 
+  // scroll-depth engine: chapters scale/fade as you dive past them,
+  // watermark numbers parallax at a slower rate
+  const chapters = Array.from(document.querySelectorAll('.chapter'));
+  if (chapters.length && !reduceMotion) {
+    let ticking = false;
+    const update = () => {
+      ticking = false;
+      const vh = window.innerHeight;
+      chapters.forEach(ch => {
+        const r = ch.getBoundingClientRect();
+        if (r.bottom < -vh || r.top > vh * 2) return;
+        const t = Math.max(-1, Math.min(1, (r.top + r.height / 2 - vh / 2) / vh));
+        const inner = ch.querySelector('.ch-inner');
+        const num = ch.querySelector('.ch-num');
+        if (inner) {
+          inner.style.transform = `translateY(${(t * -46).toFixed(1)}px) scale(${(1 - Math.abs(t) * .1).toFixed(3)})`;
+          inner.style.opacity = (1 - Math.abs(t) * .85).toFixed(3);
+        }
+        if (num) {
+          num.style.transform = `translateY(calc(-50% + ${(t * 150).toFixed(1)}px))`;
+          num.style.opacity = (0.95 - Math.abs(t) * .75).toFixed(3);
+        }
+      });
+    };
+    document.addEventListener('scroll', () => {
+      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+  }
+
   // hero constellation — a sparse, slowly drifting signal field
   const fx = document.getElementById('heroFx');
   if (fx && !reduceMotion && window.innerWidth > 720) {

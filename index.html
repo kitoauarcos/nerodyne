@@ -7,7 +7,7 @@
 <meta name="description" content="NERODYNE runs systematic equity models built by Nerodyne: 12 years backtested and now one year live. When a model changes its holdings or hedge, you get the exact moves on your phone.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style-v4.css">
+<link rel="stylesheet" href="css/style-v5.css">
 <link rel="icon" href="assets/logo.svg">
 </head>
 <body>
@@ -36,6 +36,7 @@
 <!-- HERO -->
 <section class="hero container">
   <canvas id="heroFx" class="hero-fx"></canvas>
+  <div class="scroll-cue">Scroll</div>
   <div class="hero-grid">
     <div>
       <span class="eyebrow">Systematic equity research</span>
@@ -79,6 +80,44 @@
       </div>
       <div class="chart-meta"><span>Backtested from March 2012</span><span>Data updated <span id="hero-updated">…</span></span></div>
     </div>
+  </div>
+</section>
+
+
+<!-- THE MODEL JOURNEY -->
+<section class="chapter" data-ch="vortex">
+  <div class="ch-num">01</div>
+  <div class="container ch-inner">
+    <span class="ch-idx">01 &middot; The flagship</span>
+    <h2 class="ch-title">Vortex</h2>
+    <p class="ch-line">Five distinct businesses, selected from six internal models and verified for growing revenue. The strategy at full strength.</p>
+    <div class="ch-stats" id="chstats-vortex"></div>
+    <div class="ch-spark"><canvas id="chspark-vortex"></canvas></div>
+    <div class="ch-cta"><a href="performance.html" class="btn btn-ghost">The track record</a></div>
+  </div>
+</section>
+
+<section class="chapter" data-ch="shield">
+  <div class="ch-num">02</div>
+  <div class="container ch-inner">
+    <span class="ch-idx">02 &middot; Protected</span>
+    <h2 class="ch-title">Vortex<br>Shield</h2>
+    <p class="ch-line">The same portfolio wrapped in a permanent put option overlay. In the two weakest markets of the sample it turned decline into gain.</p>
+    <div class="ch-stats" id="chstats-shield"></div>
+    <div class="ch-spark"><canvas id="chspark-shield"></canvas></div>
+    <div class="ch-cta"><a href="how-it-works.html" class="btn btn-ghost">How the hedge works</a></div>
+  </div>
+</section>
+
+<section class="chapter" data-ch="diversified">
+  <div class="ch-num">03</div>
+  <div class="container ch-inner">
+    <span class="ch-idx">03 &middot; Steady</span>
+    <h2 class="ch-title">Diversified<br>Shield</h2>
+    <p class="ch-line">A broader book of quality companies, the largest stock in the world, a dividend ETF sleeve, and an index hedge. The shallowest drawdowns of the lineup.</p>
+    <div class="ch-stats" id="chstats-diversified"></div>
+    <div class="ch-spark"><canvas id="chspark-diversified"></canvas></div>
+    <div class="ch-cta"><a href="testing.html" class="btn btn-ghost">How it is tested</a></div>
   </div>
 </section>
 
@@ -129,18 +168,13 @@
 <!-- MODELS -->
 <section class="container">
   <div class="section-head">
-    <span class="eyebrow">The model lineup</span>
-    <h2>One flagship, three risk profiles, four pure models.</h2>
-    <p class="lead">The flagship <b>Vortex</b> strategy is offered in three versions that span a range from highest return to lowest drawdown: unhedged <b>Vortex</b>, the concentrated <b>Vortex Shield</b>, and the broader <b>Diversified Shield</b>. Alongside them, the four underlying pure models it draws from, <b>Apex</b>, <b>Anchor</b>, <b>Nova</b> and <b>Pulse</b>, are available unhedged. All figures below are full sample backtests from 2012 to the present.</p>
+    <span class="eyebrow">The pure models</span>
+    <h2>Four single models, available unhedged.</h2>
+    <p class="lead">Alongside the flagship, the four underlying pure models it draws from, <b>Apex</b>, <b>Anchor</b>, <b>Nova</b> and <b>Pulse</b>, are available on their own. All figures are full sample backtests from 2012 to the present.</p>
     <div class="kicker-line"></div>
   </div>
-  <div class="picker" id="profilePicker">
-    <button data-p="growth">Maximum growth</button>
-    <button data-p="protected">Crash protected</button>
-    <button data-p="steady">Steady and broad</button>
-  </div>
   <div class="models-scroller" id="modelScroller"></div>
-  <p class="note">The first three cards are the flagship's risk profiles, higher return with deeper drawdowns through to lower return with shallower drawdowns. The remaining cards are single pure models. You choose the profile that suits you.</p>
+  <p class="note">Single models, no hedge. Higher return with deeper drawdowns on the left, steadier profiles to the right.</p>
 </section>
 
 <!-- THE MODEL IS OURS, THE SIGNALS ARE YOURS -->
@@ -239,8 +273,8 @@
 
 <script src="js/chart.umd.min.js"></script>
 <script src="data/performance.js"></script>
-<script src="js/charts-v6.js"></script>
-<script src="js/main-v3.js"></script>
-<script>NERODYNE.hero('heroChart','heroToggle'); NERODYNE.modelCards('modelScroller'); NERODYNE.bearBars('bearBars','bearPick');</script>
+<script src="js/charts-v7.js"></script>
+<script src="js/main-v4.js"></script>
+<script>NERODYNE.hero('heroChart','heroToggle'); NERODYNE.journey(); NERODYNE.modelCards('modelScroller','pure'); NERODYNE.bearBars('bearBars','bearPick');</script>
 </body>
 </html>

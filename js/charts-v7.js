@@ -163,13 +163,14 @@ const NERODYNE = (() => {
     el.innerHTML = `<div class="ticker-track">${html}${html}</div>`; // duplicated for seamless loop
   }
 
-  // Product cards: the flagship's three versions, then each pure underlying model.
-  async function modelCards(containerId) {
+  // Product cards. mode 'pure' renders only the single underlying models
+  // (the flagship's three versions live in the full-screen journey).
+  async function modelCards(containerId, mode) {
     const d = await load();
     const wrap = document.getElementById(containerId);
     if (!wrap) return;
     const flag = d.models.find(x => x.flagship) || d.models[0];
-    const variants = [
+    const variants = mode === 'pure' ? [] : [
       { m: flag, key: 'unhedged', name: flag.name, tag: 'unhedged · concentrated · highest return', col: C.accent, badge: 'Pure' },
       { m: flag, key: 'hedged', name: `${flag.name} Shield`, tag: 'hedged · concentrated · convex protection', col: C.accent2, badge: 'Hedged' },
       { m: flag, key: 'diversified', name: 'Diversified Shield', tag: 'hedged · 15+ quality holdings · dividend ETF sleeve', col: C.gold, badge: 'Diversified' }
@@ -457,5 +458,40 @@ const NERODYNE = (() => {
     render(2022);
   }
 
-  return { load, hero, ticker, modelCards, performance, testing, bearBars };
+  // full-screen model journey chapters: stats + sparkline per flagship version
+  async function journey() {
+    const d = await load();
+    const flag = d.models.find(x => x.flagship) || d.models[0];
+    const CH = [
+      ['vortex', 'unhedged', C.accent],
+      ['shield', 'hedged', C.accent2],
+      ['diversified', 'diversified', C.gold]
+    ];
+    CH.forEach(([id, key, col]) => {
+      const v = flag[key];
+      if (!v) return;
+      const st = document.getElementById(`chstats-${id}`);
+      if (st) {
+        const sYr = v.stats.worst;
+        st.innerHTML = `
+          <div class="stat"><div class="num up">+${v.stats.ann.toFixed(1)}%</div><div class="lbl">Annualised</div></div>
+          <div class="stat"><div class="num">${v.stats.sharpe.toFixed(2)}</div><div class="lbl">Sharpe</div></div>
+          <div class="stat"><div class="num ${sYr < 0 ? 'down' : 'up'}">${sYr >= 0 ? '+' : ''}${sYr.toFixed(1)}%</div><div class="lbl">Worst year</div></div>
+          <div class="stat"><div class="num down">${v.stats.maxdd.toFixed(1)}%</div><div class="lbl">Max drawdown</div></div>`;
+      }
+      const cv = document.getElementById(`chspark-${id}`);
+      if (cv) new Chart(cv, {
+        type: 'line',
+        data: { labels: flag.dates, datasets: [ds('', v.curve, col, true)] },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false }, tooltip: { enabled: false } },
+          scales: { x: { display: false }, y: { display: false, type: 'logarithmic' } },
+          elements: { point: { radius: 0 }, line: { borderWidth: 2, tension: .15 } }
+        }
+      });
+    });
+  }
+
+  return { load, hero, ticker, modelCards, performance, testing, bearBars, journey };
 })();
