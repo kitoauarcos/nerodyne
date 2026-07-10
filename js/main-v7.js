@@ -102,13 +102,14 @@
     }, true);
   }
 
-  // z-axis fly-through: scroll dollies the camera through the homepage scenes.
+  // scene crossfade: scrolling through the pinned stage gently fades and
+  // scales between the chapters (subtle, works on phones too).
   // The rendered position lerps toward the scroll target for an inertial glide.
   const track = document.getElementById('zoomTrack');
   const scenes = track ? Array.from(track.querySelectorAll('.scene')) : [];
-  if (track && scenes.length > 1 && !reduceMotion && window.innerWidth > 920) {
+  if (track && scenes.length > 1 && !reduceMotion) {
     document.documentElement.classList.add('zoom-on');
-    track.style.height = (scenes.length * 160) + 'vh';
+    track.style.height = (scenes.length * 140) + 'vh';
 
     const dots = document.createElement('div');
     dots.className = 'scene-dots';
@@ -116,7 +117,6 @@
     document.body.appendChild(dots);
     const dotEls = Array.from(dots.children);
 
-    const SP = 1050;          // z distance between scenes (gentler than before)
     let target = 0, shown = -1, raf = null;
 
     const render = (p) => {
@@ -124,17 +124,21 @@
       scenes.forEach((sc, i) => {
         const d = i - p;
         let op;
-        if (d >= 0) op = 1 - Math.min(1, Math.max(0, (d - .05) / .9));
-        else op = 1 - Math.min(1, -d * 1.9);
-        sc.style.transform = 'translateZ(' + (-d * SP).toFixed(1) + 'px)';
+        if (d >= 0) op = 1 - Math.min(1, Math.max(0, (d - .12) / .75));
+        else op = 1 - Math.min(1, -d * 1.7);
+        // scenes ahead sit slightly smaller and settle to full size; passed
+        // scenes drift a touch larger — a quiet zoom, not a camera dolly
+        const sca = 1 - Math.max(-1, Math.min(1, d)) * .05;
+        sc.style.transform = 'scale(' + sca.toFixed(4) + ')';
         sc.style.opacity = op.toFixed(3);
         sc.style.visibility = op <= 0.02 ? 'hidden' : 'visible';
         sc.style.pointerEvents = Math.abs(d) < .45 ? 'auto' : 'none';
       });
       const active = Math.round(p);
       dotEls.forEach((el, i) => el.classList.toggle('on', i === active));
+      // the dots only belong to the pinned stage — hide them before and after it
       const r = track.getBoundingClientRect();
-      dots.classList.toggle('gone', r.bottom < vh * .6);
+      dots.classList.toggle('gone', r.bottom < vh * .6 || r.top > vh * .4);
     };
 
     const targetP = () => {
