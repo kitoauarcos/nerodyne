@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Members · NERODYNE</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style-v8.css">
+<link rel="icon" href="assets/logo.svg">
+</head>
+<body>
+<header class="site-header">
+  <div class="container nav">
+    <a class="logo" href="index.html"><img class="mark" src="assets/logo.svg" alt=""><span class="word"><b>N</b>ERO<b>D</b>YNE</span></a>
+    <button class="hamburger" aria-label="Menu">☰</button>
+    <nav class="nav-links">
+      <a href="performance.html">Performance</a><a href="how-it-works.html">How it works</a><a href="testing.html">Testing</a>
+      <a href="build-your-own.html">Build your own</a><a href="about.html">About</a>
+      <a href="contact.html">Contact</a><a href="positions.html">Members</a>
+      <a href="signup.html" class="nav-cta">Request access</a>
+    </nav>
+  </div>
+</header>
+
+<section class="page-hero container">
+  <span class="eyebrow">Members area</span>
+  <h1>The current Vortex portfolio.</h1>
+  <p class="lead">Registered members sign in with a one-time code sent to their email. There are no passwords. The positions shown are those of the most recent rebalance.</p>
+</section>
+
+<section class="container" style="padding-top:24px;">
+  <div id="memberGate" class="panel" style="max-width:620px;margin-inline:auto;padding:30px;">
+
+    <!-- state 1: request a code -->
+    <div id="authEmail">
+      <h3>Sign in</h3>
+      <p class="note mt-s" style="margin-bottom:18px;">Enter your registered email and we will send you a 6-digit sign-in code. Not registered yet? <a href="signup.html" style="color:var(--accent)">Request access</a> first.</p>
+      <div class="form" style="max-width:none;">
+        <label>Email<input type="email" id="loginEmail" required placeholder="you@email.com"></label>
+        <button class="btn btn-primary" id="sendCode" type="button">Email me a sign-in code</button>
+      </div>
+    </div>
+
+    <!-- state 2: enter the code -->
+    <div id="authCode" style="display:none;">
+      <h3>Enter your code</h3>
+      <p class="note mt-s" style="margin-bottom:18px;">Type the 6-digit code from the email. Codes expire after a few minutes.</p>
+      <div class="form" style="max-width:none;">
+        <label>Code<input type="text" id="loginCode" inputmode="numeric" maxlength="6" placeholder="123456" class="code-input"></label>
+        <button class="btn btn-primary" id="verifyCode" type="button">Sign in</button>
+        <button class="btn btn-ghost" id="backToEmail" type="button">Use a different email</button>
+      </div>
+    </div>
+
+    <p id="authMsg" class="note" style="display:none;margin-top:16px;"></p>
+
+    <!-- state 3: the positions -->
+    <div id="posArea" style="display:none;">
+      <div class="chart-head" style="flex-wrap:wrap;gap:10px;">
+        <div>
+          <h3>Vortex · current positions</h3>
+          <p class="note" id="posAsOf"></p>
+        </div>
+        <button class="btn btn-ghost" id="signOut" type="button" style="padding:9px 18px;">Sign out</button>
+      </div>
+      <div class="wm-wrap mt-s">
+        <div class="wm-overlay" id="posWatermark" aria-hidden="true"></div>
+        <table class="tbl">
+          <thead><tr><th>Ticker</th><th style="text-align:left;">Company</th><th>Weight</th></tr></thead>
+          <tbody id="posRows"></tbody>
+        </table>
+      </div>
+      <p class="license-line" id="posLicense"></p>
+      <p class="note mt-m">Rebalance and hedge updates are delivered by Telegram or email when the portfolio changes. This page always reflects the most recent rebalance. Research output only, not investment advice; you execute in your own brokerage account.</p>
+    </div>
+
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div><a class="logo" href="index.html"><img class="mark" src="assets/logo.svg" alt=""><span class="word"><b>N</b>ERO<b>D</b>YNE</span></a><p class="mt-s" style="font-size:.9rem;">Systematic equity research, delivered to subscribers.</p></div>
+      <div><h4>Product</h4><a href="performance.html">Performance</a><a href="testing.html">Testing</a><a href="how-it-works.html">How it works</a><a href="pricing.html">Access</a><a href="build-your-own.html">Build your own</a></div>
+      <div><h4>Company</h4><a href="about.html">About</a><a href="contact.html">Contact</a><a href="signup.html">Request access</a></div>
+      <div><h4>Get started</h4><a href="signup.html">Request access</a><a href="pricing.html">Subscription</a></div>
+    </div>
+    <p class="disclaimer">Positions shown are research output for registered members, for personal use only; redistribution ends access. NERODYNE (a Nerodyne service) provides research and educational material only, not personalised investment advice, brokerage, or asset management. Investing involves risk, including the possible loss of principal.</p>
+    <p class="copyright">© <span data-year></span> Nerodyne. All rights reserved.</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/main-v7.js"></script>
+<script src="js/members.js"></script>
+</body>
+</html>

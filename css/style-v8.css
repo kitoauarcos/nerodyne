@@ -891,6 +891,20 @@ html.anim-off .bg-fx, html.anim-off .hero-fx { display: none; }
 /* ── softer, larger card geometry ── */
 .cta-band { border-radius: 28px; }
 
+/* ── members area: per-user watermark + code input ── */
+.wm-wrap { position: relative; overflow: hidden; border-radius: var(--radius-sm); }
+.wm-overlay {
+  position: absolute; inset: -60px; z-index: 5;
+  display: flex; flex-wrap: wrap; gap: 52px 58px; align-items: center; justify-content: center;
+  transform: rotate(-22deg); pointer-events: none; user-select: none;
+}
+.wm-overlay span {
+  font-family: var(--mono); font-size: .78rem; letter-spacing: .08em;
+  color: rgba(255,255,255,.055); white-space: nowrap;
+}
+.license-line { font-family: var(--mono); font-size: .68rem; color: var(--faint); margin-top: 14px; }
+.code-input { letter-spacing: .45em; font-family: var(--mono); font-size: 1.25rem; text-align: center; }
+
 /* ── responsive + reduced motion ── */
 @media (max-width: 920px) {
   .site-header { top: 10px; padding-inline: 10px; }
